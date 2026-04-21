@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garak — Beginner's Guide for Windows</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f5f0e8;
+    --ink: #1a1814;
+    --ink2: #3d3a35;
+    --muted: #7a756c;
+    --border: #ddd8ce;
+    --teal: #1a6e6e;
+    --teal-light: #e6f3f3;
+    --teal-mid: #2a9090;
+    --amber: #b86b00;
+    --amber-light: #fff4e0;
+    --red: #b03030;
+    --red-light: #fdeaea;
+    --green: #2a6e3a;
+    --green-light: #eaf4ec;
+    --term-bg: #111613;
+    --term-text: #c8f0c0;
+    --term-prompt: #5dbf5d;
+    --term-comment: #5a7a5a;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* ── Header ── */
+  .hero {
+    background: var(--ink);
+    color: #f0ece4;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg, transparent, transparent 40px,
+      rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px
+    ), repeating-linear-gradient(
+      0deg, transparent, transparent 40px,
+      rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px
+    );
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--teal-mid);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 600;
+    letter-spacing: -.02em;
+    margin-bottom: .5rem;
+    position: relative;
+  }
+  .hero h1 span { color: var(--teal-mid); }
+  .hero p {
+    font-size: 1.05rem;
+    color: #9d9990;
+    max-width: 540px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ── Layout ── */
+  .container { max-width: 820px; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* ── Nav pills ── */
+  .nav-pills {
+    display: flex;
+    gap: 8px;
+    padding: 1.5rem 0 0;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .nav-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .05em;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .nav-pill:hover { border-color: var(--teal-mid); color: var(--teal); }
+  .nav-pill.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* ── Section ── */
+  .section { padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: .5rem;
+  }
+  .section h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    color: var(--ink);
+    margin-bottom: 1.2rem;
+  }
+
+  /* ── Step cards ── */
+  .steps { display: flex; flex-direction: column; gap: 1.2rem; }
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-num.teal { background: var(--teal-mid); }
+  .step-num.amber { background: var(--amber); }
+  .step-body h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: .35rem;
+  }
+  .step-body p {
+    font-size: .95rem;
+    color: var(--ink2);
+    margin-bottom: .6rem;
+  }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  /* ── Terminal block ── */
+  .term {
+    background: var(--term-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: .6rem 0 .4rem;
+    font-size: .88rem;
+  }
+  .term-bar {
+    background: #1e2420;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .term-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .term-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #4a6a4a;
+    margin-left: 4px;
+  }
+  .term-copy {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #4a6a4a;
+    background: none;
+    border: 1px solid #2a4a2a;
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .term-copy:hover { color: #7abf7a; border-color: #4a8a4a; }
+  .term-copy.copied { color: #7abf7a; }
+  .term-body {
+    padding: 14px 18px;
+    font-family: 'DM Mono', monospace;
+    color: var(--term-text);
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+  .term-body .prompt { color: var(--term-prompt); }
+  .term-body .comment { color: var(--term-comment); }
+  .term-body .highlight { color: #f0c060; }
+  .term-body .out { color: #7a9a7a; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 8px;
+    padding: .9rem 1.1rem;
+    font-size: .92rem;
+    margin: .8rem 0;
+    display: flex;
+    gap: .7rem;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .callout.info { background: var(--teal-light); color: var(--teal); border-left: 3px solid var(--teal-mid); }
+  .callout.warn { background: var(--amber-light); color: var(--amber); border-left: 3px solid var(--amber); }
+  .callout.tip { background: var(--green-light); color: var(--green); border-left: 3px solid var(--green); }
+  .callout.danger { background: var(--red-light); color: var(--red); border-left: 3px solid var(--red); }
+  .callout strong { font-weight: 500; }
+
+  /* ── Tabs ── */
+  .tabs { margin: 1.5rem 0 .5rem; }
+  .tab-buttons {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 1.2rem;
+  }
+  .tab-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 8px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all .15s;
+  }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal-mid); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Probe table ── */
+  .probe-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: .8rem;
+  }
+  .probe-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+  }
+  .probe-card .probe-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--teal);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .probe-card .probe-desc {
+    font-size: .85rem;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+  .probe-card .probe-risk {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-top: 5px;
+  }
+  .risk-high { background: var(--red-light); color: var(--red); }
+  .risk-med { background: var(--amber-light); color: var(--amber); }
+  .risk-low { background: var(--green-light); color: var(--green); }
+
+  /* ── Result reader ── */
+  .result-lines { display: flex; flex-direction: column; gap: 8px; margin-top: .8rem; }
+  .result-line {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .7rem 1rem;
+    font-size: .9rem;
+  }
+  .result-line .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  .tag-pass { background: var(--green-light); color: var(--green); }
+  .tag-fail { background: var(--red-light); color: var(--red); }
+  .result-line .rl-text { color: var(--ink2); line-height: 1.5; }
+
+  /* ── Footer ── */
+  .footer {
+    background: var(--ink);
+    color: #6a6660;
+    text-align: center;
+    padding: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    margin-top: 2rem;
+  }
+  .footer a { color: var(--teal-mid); text-decoration: none; }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: .88em;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--teal);
+  }
+
+  @media (max-width: 600px) {
+    .probe-grid { grid-template-columns: 1fr; }
+    .step { grid-template-columns: 32px 1fr; gap: .7rem; }
+    .step-num { width: 32px; height: 32px; font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">Windows Guide · Beginner Friendly</div>
+  <h1>Scanning LLMs with <span>garak</span></h1>
+  <p>A step-by-step walkthrough for scanning Ollama and Hugging Face models on Windows — no prior experience needed.</p>
+</div>
+
+<div class="container">
+
+  <!-- Nav -->
+  <nav class="nav-pills">
+    <a href="#what-is-garak" class="nav-pill">What is garak?</a>
+    <a href="#install" class="nav-pill">Installation</a>
+    <a href="#ollama" class="nav-pill">Scan Ollama models</a>
+    <a href="#huggingface" class="nav-pill">Scan HuggingFace models</a>
+    <a href="#probes" class="nav-pill">Probe reference</a>
+    <a href="#results" class="nav-pill">Reading results</a>
+  </nav>
+
+  <!-- What is garak -->
+  <section class="section" id="what-is-garak">
+    <div class="section-label">Overview</div>
+    <h2>What is garak?</h2>
+    <p style="color:var(--ink2); margin-bottom:1rem;">
+      Garak is a free, open-source security scanner for AI language models — made by NVIDIA. Think of it like an antivirus scan, but for LLMs. It sends carefully crafted test prompts to a model and checks whether the model can be tricked into doing things it shouldn't — like ignoring its instructions, generating harmful content, or leaking information.
+    </p>
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div><strong>Good to know:</strong> You don't need to be a security expert to use garak. This guide walks you through every step, from installing Python to reading your first scan report.</div>
+    </div>
+  </section>
+
+  <!-- Installation -->
+  <section class="section" id="install">
+    <div class="section-label">Step 1 of 2 — Setup</div>
+    <h2>Installation on Windows</h2>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Install Python (3.10, 3.11, or 3.12)</h3>
+          <p>Garak requires Python. Open your browser and go to <strong>python.org/downloads</strong>. Download Python 3.12. When installing, make sure to tick <strong>"Add Python to PATH"</strong> at the bottom of the installer — this is important!</p>
+          <div class="callout warn">
+            <span class="callout-icon">⚠️</span>
+            <div><strong>Python version matters.</strong> Garak does not support Python 3.13 yet. Stick to 3.10, 3.11, or 3.12.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Open Command Prompt</h3>
+          <p>Press <strong>Windows key + R</strong>, type <code>cmd</code>, and hit Enter. This opens the Command Prompt — a black window where you type commands. All the commands in this guide go here.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Check Python is working</h3>
+          <div class="term">
+            <div class="term-bar">
+              <div class="term-dot" style="background:#ff5f57"></div>
+              <div class="term-dot" style="background:#febc2e"></div>
+              <div class="term-dot" style="background:#28c840"></div>
+              <span class="term-title">Command Prompt</span>
+              <button class="term-copy" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="term-body"><span class="prompt">C:\> </span>python --version</div>
+          </div>
+          <p>You should see something like <code>Python 3.12.x</code>. If you see an error, Python wasn't added to PATH — reinstall it and tick the box.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Install garak</h3>
+          <p>Run this command. It downloads and installs garak automatically. This may take a couple of minutes.</p>
+          <div class="term">
+            <div class="term-bar">
+              <div class="term-dot" style="background:#ff5f57"></div>
+              <div class="term-dot" style="background:#febc2e"></div>
+              <div class="term-dot" style="background:#28c840"></div>
+              <span class="term-title">Command Prompt</span>
+              <button class="term-copy" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="term-body"><span class="prompt">C:\> </span>pip install garak</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Verify garak installed correctly</h3>
+          <div class="term">
+            <div class="term-bar">
+              <div class="term-dot" style="background:#ff5f57"></div>
+              <div class="term-dot" style="background:#febc2e"></div>
+              <div class="term-dot" style="background:#28c840"></div>
+              <span class="term-title">Command Prompt</span>
+              <button class="term-copy" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="term-body"><span class="prompt">C:\> </span>python -m garak --help</div>
+          </div>
+          <p>If you see a list of options, you're all set. If you see an error, try restarting Command Prompt and running the install command again.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Ollama -->
+  <section class="section" id="ollama">
+    <div class="section-label">Step 2 — Scanning</div>
+    <h2>Scanning a model running in Ollama</h2>
+    <p style="color:var(--ink2); margin-bottom:1.2rem;">
+      Ollama lets you run AI models locally on your own PC. Before scanning, Ollama must be installed and the model must be running. If you don't have Ollama yet, download it from <strong>ollama.com</strong>.
+    </p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num teal">1</div>
+        <div class="step-body">
+          <h3>Make sure Ollama is running</h3>
+          <p>Open a <strong>separate</strong> Command Prompt window and start Ollama. Keep this window open while scanning.</p>
+          <div class="term">
+            <div class="term-bar">
+              <div class="term-dot" style="background:#ff5f57"></div>
+              <div class="term-dot" style="background:#febc2e"></div>
+              <div class="term-dot" style="background:#28c840"></div>
+              <span class="term-title">Command Prompt — keep this open</span>
+              <button class="term-copy" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="term-body"><span class="prompt">C:\> </span>ollama serve</div>
+          </div>
+          <div class="callout info">
+            <span class="callout-icon">ℹ️</span>
+            <div>Ollama runs on port <strong>11434</strong> on your machine by default. Garak will connect to it automatically — you don't need to do anything else.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num teal">2</div>
+        <div class="step-body">
+          <h3>Pull a model (if you haven't already)</h3>
+          <p>In your original Command Prompt, download a model to test. Replace <code>qwen2.5:3b</code> with any model from <strong>ollama.com/library</strong>.</p>
+          <div class="term">
+            <div class="term-bar">
+              <div class="term-dot" style="background:#ff5f57"></div>
+              <div class="term-dot" style="background:#febc2e"></div>
+              <div class="term-dot" style="background:#28c840"></div>
+              <span class="term-title">Command Prompt</span>
+              <button class="term-copy" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="term-body"><span class="prompt">C:\> </span>ollama pull qwen2.5:3b</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num teal">3</div>
+        <div class="step-body">
+          <h3>Run your first scan</h3>
+          <p>This command scans your model with the <strong>DAN</strong> probe — testing if the model can be tricked into bypassing its instructions. Replace <code>qwen2.5:3b</code> with the name of your model.</p>
+          <div class="term">
+            <div class="term-bar">
+              <div class="term-dot" style="background:#ff5f57"></div>
+              <div class="term-dot" style="background:#febc2e"></div>
+              <div class="term-dot" style="background:#28c840"></div>
+              <span class="term-title">Command Prompt</span>
+              <button class="term-copy" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="term-body"><span class="prompt">C:\> </span><span class="highlight">python -m garak</span> --target_type ollama --target_name qwen2.5:3b --probes dan</div>
+          </div>
+          <div class="callout tip">
+            <span class="callout-icon">💡</span>
+            <div><strong>Using a chat model?</strong> Add <code>OllamaGeneratorChat</code> to get better results with instruction-tuned models: <code>--target_type ollama.OllamaGeneratorChat</code></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num teal">4</div>
+        <div class="step-body">
+          <h3>More scan examples</h3>
+          <div class="tabs">
+            <div class="tab-buttons">
+              <button class="tab-btn active" onclick="switchTab(this,'ol-a')">Specific probe</button>
+              <button class="tab-btn" onclick="switchTab(this,'ol-b')">Multiple probes</button>
+              <button class="tab-btn" onclick="switchTab(this,'ol-c')">Full scan</button>
+              <button class="tab-btn" onclick="switchTab(this,'ol-d')">Remote Ollama</button>
+            </div>
+            <div class="tab-panel active" id="ol-a">
+              <div class="term">
+                <div class="term-bar">
+                  <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div>
+                  <span class="term-title">Specific probe</span>
+                  <button class="term-copy" onclick="copyCode(this)">copy</button>
+                </div>
+                <div class="term-body"><span class="comment"># Test a single jailbreak probe (faster)</span>
+<span class="prompt">C:\> </span>python -m garak --target_type ollama --target_name llama3.2 --probes dan.Dan_11_0</div>
+              </div>
+            </div>
+            <div class="tab-panel" id="ol-b">
+              <div class="term">
+                <div class="term-bar">
+                  <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div>
+                  <span class="term-title">Multiple probes</span>
+                  <button class="term-copy" onclick="copyCode(this)">copy</button>
+                </div>
+                <div class="term-body"><span class="comment"># Run DAN and encoding probes together (comma-separated)</span>
+<span class="prompt">C:\> </span>python -m garak --target_type ollama --target_name llama3.2 --probes dan,encoding</div>
+              </div>
+            </div>
+            <div class="tab-panel" id="ol-c">
+              <div class="term">
+                <div class="term-bar">
+                  <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div>
+                  <span class="term-title">Full scan (slow — all probes)</span>
+                  <button class="term-copy" onclick="copyCode(this)">copy</button>
+                </div>
+                <div class="term-body"><span class="comment"># Warning: this can take many hours on a local model</span>
+<span class="prompt">C:\> </span>python -m garak --target_type ollama --target_name llama3.2 --probes all</div>
+              </div>
+            </div>
+            <div class="tab-panel" id="ol-d">
+              <div class="term">
+                <div class="term-bar">
+                  <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div>
+                  <span class="term-title">Ollama on a different machine</span>
+                  <button class="term-copy" onclick="copyCode(this)">copy</button>
+                </div>
+                <div class="term-body"><span class="comment"># If Ollama isn't on your local machine, set the host IP</span>
+<span class="prompt">C:\> </span>python -m garak --target_type ollama --target_name llama3.2 --probes dan ^
+  --generator_options "{\"generators\":{\"ollama\":{\"OllamaGenerator\":{\"host\":\"http://192.168.1.10:11434\"}}}}"</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HuggingFace -->
+  <section class="section" id="huggingface">
+    <div class="section-label">Step 2 (alt) — Scanning</div>
+    <h2>Scanning a Hugging Face model</h2>
+    <p style="color:var(--ink2); margin-bottom:1.2rem;">
+      Hugging Face hosts thousands of open AI models. Garak can scan them in two ways: downloading the model to run locally on your PC, or using Hugging Face's cloud API (no download needed, but rate-limited without a key).
+    </p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num amber">1</div>
+        <div class="step-body">
+          <h3>Get a free Hugging Face API token (recommended)</h3>
+          <p>Without a token, scans will be heavily rate-limited and may fail. Sign up for free at <strong>huggingface.co</strong>, then go to <strong>huggingface.co/settings/tokens</strong> and create a token with the <em>Read</em> role. Copy the token — it starts with <code>hf_</code>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num amber">2</div>
+        <div class="step-body">
+          <h3>Set your token in Command Prompt</h3>
+          <p>Paste your token in the command below. This only lasts for your current Command Prompt session — you'll need to set it again next time.</p>
+          <div class="term">
+            <div class="term-bar">
+              <div class="term-dot" style="background:#ff5f57"></div>
+              <div class="term-dot" style="background:#febc2e"></div>
+              <div class="term-dot" style="background:#28c840"></div>
+              <span class="term-title">Command Prompt</span>
+              <button class="term-copy" onclick="copyCode(this)">copy</button>
+            </div>
+            <div class="term-body"><span class="comment"># Replace hf_xxxx... with your actual token</span>
+<span class="prompt">C:\> </span>set HF_INFERENCE_TOKEN=hf_xxxxxxxxxxxxxxxxxxxx</div>
+          </div>
+          <div class="callout tip">
+            <span class="callout-icon">💡</span>
+            <div><strong>Make it permanent:</strong> Search for "Environment Variables" in Windows Settings → System → Advanced → Environment Variables, and add <code>HF_INFERENCE_TOKEN</code> there so you don't have to set it every session.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num amber">3</div>
+        <div class="step-body">
+          <h3>Choose your scanning method</h3>
+          <div class="tabs">
+            <div class="tab-buttons">
+              <button class="tab-btn active" onclick="switchTab(this,'hf-a')">Cloud API (easy)</button>
+              <button class="tab-btn" onclick="switchTab(this,'hf-b')">Local download</button>
+              <button class="tab-btn" onclick="switchTab(this,'hf-c')">Specific probe</button>
+            </div>
+            <div class="tab-panel active" id="hf-a">
+              <p style="font-size:.9rem;color:var(--ink2);margin-bottom:.6rem;">Runs the model on HuggingFace's servers — no big download needed. Requires your API token to be set.</p>
+              <div class="term">
+                <div class="term-bar">
+                  <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div>
+                  <span class="term-title">Hugging Face Inference API</span>
+                  <button class="term-copy" onclick="copyCode(this)">copy</button>
+                </div>
+                <div class="term-body"><span class="comment"># Use HF's cloud to run the model — no local download</span>
+<span class="prompt">C:\> </span>python -m garak --target_type huggingface.InferenceAPI --target_name gpt2 --probes dan</div>
+              </div>
+            </div>
+            <div class="tab-panel" id="hf-b">
+              <p style="font-size:.9rem;color:var(--ink2);margin-bottom:.6rem;">Downloads the model to your machine and runs it locally. Requires enough RAM/VRAM. Slower to start, but no API limits.</p>
+              <div class="term">
+                <div class="term-bar">
+                  <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div>
+                  <span class="term-title">Local model (downloads to your PC)</span>
+                  <button class="term-copy" onclick="copyCode(this)">copy</button>
+                </div>
+                <div class="term-body"><span class="comment"># Downloads model locally (model name comes from HF Hub)</span>
+<span class="prompt">C:\> </span>python -m garak --target_type huggingface --target_name openai-community/gpt2 --probes dan</div>
+              </div>
+              <div class="callout warn">
+                <span class="callout-icon">⚠️</span>
+                <div><strong>Disk space:</strong> Models can be several GB. Make sure you have space before running local downloads. Models are cached in <code>%USERPROFILE%\.cache\huggingface\</code></div>
+              </div>
+            </div>
+            <div class="tab-panel" id="hf-c">
+              <p style="font-size:.9rem;color:var(--ink2);margin-bottom:.6rem;">Run a specific, targeted probe instead of the whole category for faster results.</p>
+              <div class="term">
+                <div class="term-bar">
+                  <div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div>
+                  <span class="term-title">Specific probe on HF model</span>
+                  <button class="term-copy" onclick="copyCode(this)">copy</button>
+                </div>
+                <div class="term-body"><span class="comment"># Test one specific jailbreak variant — much faster</span>
+<span class="prompt">C:\> </span>python -m garak --target_type huggingface --target_name openai-community/gpt2 --probes dan.Dan_11_0,encoding</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num amber">4</div>
+        <div class="step-body">
+          <h3>How to find the model name on HuggingFace</h3>
+          <p>Go to <strong>huggingface.co</strong>, find a model you want to test, and copy the name from the URL or the top of the model page. It looks like <code>author/model-name</code>, for example <code>mistralai/Mistral-7B-v0.1</code> or <code>meta-llama/Llama-3.2-3B</code>. Use that exact string as your <code>--target_name</code>.</p>
+          <div class="callout danger">
+            <span class="callout-icon">🔒</span>
+            <div><strong>Gated models:</strong> Some models (like Llama) require you to accept a license on HuggingFace.co first, then use your token. If you get an access error, visit the model page and click "Request Access".</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Probes -->
+  <section class="section" id="probes">
+    <div class="section-label">Reference</div>
+    <h2>Common probes — what to scan for</h2>
+    <p style="color:var(--ink2); margin-bottom:.8rem;">Each probe tests a different kind of vulnerability. Start with the ones marked <span style="font-size:.85em;background:var(--red-light);color:var(--red);padding:1px 6px;border-radius:10px;font-family:'DM Mono',monospace">high risk</span> for your first scan.</p>
+
+    <div class="probe-grid">
+      <div class="probe-card">
+        <div class="probe-name">--probes dan</div>
+        <div class="probe-desc">Tests if the model can be tricked with "Do Anything Now" jailbreak prompts — the most common attack type.</div>
+        <span class="probe-risk risk-high">high risk · start here</span>
+      </div>
+      <div class="probe-card">
+        <div class="probe-name">--probes encoding</div>
+        <div class="probe-desc">Sends harmful instructions hidden in Base64, hex, ROT13, and other encodings to slip past filters.</div>
+        <span class="probe-risk risk-high">high risk</span>
+      </div>
+      <div class="probe-card">
+        <div class="probe-name">--probes promptinject</div>
+        <div class="probe-desc">Tests prompt injection — can a user override the system prompt or inject hidden instructions?</div>
+        <span class="probe-risk risk-high">high risk</span>
+      </div>
+      <div class="probe-card">
+        <div class="probe-name">--probes lmrc</div>
+        <div class="probe-desc">Language Model Risk Cards: covers toxicity, slurs, sexual content, self-harm, and other harmful outputs.</div>
+        <span class="probe-risk risk-high">high risk</span>
+      </div>
+      <div class="probe-card">
+        <div class="probe-name">--probes hallucination</div>
+        <div class="probe-desc">Checks if the model confidently makes up facts or gives wrong answers to trick questions.</div>
+        <span class="probe-risk risk-med">medium risk</span>
+      </div>
+      <div class="probe-card">
+        <div class="probe-name">--probes leakreplay</div>
+        <div class="probe-desc">Can the model be made to repeat its system prompt or training data it shouldn't reveal?</div>
+        <span class="probe-risk risk-med">medium risk</span>
+      </div>
+      <div class="probe-card">
+        <div class="probe-name">--probes continuation</div>
+        <div class="probe-desc">Tries to get the model to continue harmful text by giving it a partial opening.</div>
+        <span class="probe-risk risk-med">medium risk</span>
+      </div>
+      <div class="probe-card">
+        <div class="probe-name">--probes ansiescape</div>
+        <div class="probe-desc">Checks for ANSI escape code injection — an edge case where terminal output could be manipulated.</div>
+        <span class="probe-risk risk-low">low risk</span>
+      </div>
+    </div>
+
+    <div style="margin-top:1.2rem">
+      <p style="color:var(--ink2);font-size:.92rem;margin-bottom:.6rem;">To see all available probes:</p>
+      <div class="term">
+        <div class="term-bar">
+          <div class="term-dot" style="background:#ff5f57"></div>
+          <div class="term-dot" style="background:#febc2e"></div>
+          <div class="term-dot" style="background:#28c840"></div>
+          <span class="term-title">Command Prompt</span>
+          <button class="term-copy" onclick="copyCode(this)">copy</button>
+        </div>
+        <div class="term-body"><span class="prompt">C:\> </span>python -m garak --list_probes</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section class="section" id="results">
+    <div class="section-label">Reference</div>
+    <h2>Reading the scan results</h2>
+    <p style="color:var(--ink2); margin-bottom:1rem;">When a scan finishes, garak prints a summary to the terminal and saves a full report. Here's what it all means.</p>
+
+    <h3 style="font-size:1rem;font-weight:500;margin-bottom:.6rem;color:var(--ink)">Terminal output — what each line means</h3>
+    <div class="result-lines">
+      <div class="result-line">
+        <span class="tag tag-pass">PASS</span>
+        <div class="rl-text"><strong>The model is not vulnerable to this probe.</strong> It correctly refused or ignored the attack in most attempts. Lower failure rate = better.</div>
+      </div>
+      <div class="result-line">
+        <span class="tag tag-fail">FAIL</span>
+        <div class="rl-text"><strong>The model was vulnerable.</strong> It was successfully tricked on some attempts. The line shows how many passed out of total — e.g. <code>ok on 51/635</code> means only 51 attempts were safe.</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:500;margin:1.2rem 0 .6rem;color:var(--ink)">Where are the report files saved?</h3>
+    <div class="term">
+      <div class="term-bar">
+        <div class="term-dot" style="background:#ff5f57"></div>
+        <div class="term-dot" style="background:#febc2e"></div>
+        <div class="term-dot" style="background:#28c840"></div>
+        <span class="term-title">Default report location on Windows</span>
+        <button class="term-copy" onclick="copyCode(this)">copy</button>
+      </div>
+      <div class="term-body"><span class="comment"># Open this folder in Explorer to find your reports</span>
+<span class="prompt">C:\> </span>explorer %APPDATA%\garak\garak_runs</div>
+    </div>
+    <p style="color:var(--ink2);font-size:.92rem;margin-top:.7rem;">Each scan creates three files: a <code>.jsonl</code> report (machine-readable, like the one in this guide), a <code>.hitlog.jsonl</code> file listing every vulnerability found, and a <code>.html</code> summary you can open in your browser.</p>
+
+    <div class="callout tip" style="margin-top:1rem">
+      <span class="callout-icon">💡</span>
+      <div><strong>Quick tip:</strong> Open the <code>.html</code> report in your browser for a readable summary. Share the <code>.jsonl</code> file with garak's dashboard visualizer (like the one at the top of this page) to explore results interactively.</div>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:500;margin:1.2rem 0 .6rem;color:var(--ink)">Useful extra flags</h3>
+    <div class="term">
+      <div class="term-bar">
+        <div class="term-dot" style="background:#ff5f57"></div>
+        <div class="term-dot" style="background:#febc2e"></div>
+        <div class="term-dot" style="background:#28c840"></div>
+        <span class="term-title">Handy flags to add to any scan</span>
+      </div>
+      <div class="term-body"><span class="comment"># Run fewer test generations (faster, less thorough)</span>
+<span class="highlight">--generations 1</span>
+
+<span class="comment"># See more details as the scan runs</span>
+<span class="highlight">--verbose</span>
+
+<span class="comment"># Run multiple probes in parallel (speeds things up)</span>
+<span class="highlight">--parallel_attempts 4</span>
+
+<span class="comment"># Get info about a specific probe before running it</span>
+<span class="highlight">python -m garak --plugin_info probes.dan.Dan_11_0</span></div>
+    </div>
+  </section>
+
+</div><!-- /container -->
+
+<div class="footer">
+  garak by NVIDIA — <a href="https://github.com/NVIDIA/garak" target="_blank">github.com/NVIDIA/garak</a> &nbsp;·&nbsp;
+  <a href="https://reference.garak.ai" target="_blank">reference.garak.ai</a>
+  <br>
+  <span style="color:#3a3632;margin-top:4px;display:block">Guide for garak v0.14+ · Python 3.10–3.12 required</span>
+</div>
+
+<script>
+function copyCode(btn) {
+  const body = btn.closest('.term').querySelector('.term-body');
+  const text = body.innerText
+    .replace(/^C:\\> /gm, '')
+    .replace(/^# .+\n/gm, '')
+    .trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+function switchTab(btn, panelId) {
+  const container = btn.closest('.tabs');
+  container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+</script>
+
+</body>
+</html>
